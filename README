@@ -4,7 +4,7 @@ Files:
     - README
 
 Compilation Steps:
-
+gcc test_gcd_floating.c -lm
 
 Execution Steps:
 
@@ -12,3 +12,9 @@ Execution Steps:
 Structure of Program
 
 
+Assumptions:
+    - Scheduling works for one processor
+    - It is static scheduler
+    - If there is no task to schedule it is denoted by symbol x (idle) state
+    - Aperiodic jobs can be scheduled at idle intervals
+    - https://users.ece.cmu.edu/~eno/coding/CCodingStandard.html

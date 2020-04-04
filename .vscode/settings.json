@@ -1,0 +1,21 @@
+{
+    "files.associations": {
+        "stdio.h": "c",
+        "cstdio": "c",
+        "cmath": "c",
+        "array": "c",
+        "*.tcc": "c",
+        "istream": "c",
+        "new": "c",
+        "ostream": "c",
+        "sstream": "c",
+        "streambuf": "c",
+        "type_traits": "c",
+        "hash_map": "c",
+        "chrono": "c",
+        "algorithm": "c",
+        "fort.h": "c",
+        "string": "c",
+        "string.h": "c"
+    }
+}
