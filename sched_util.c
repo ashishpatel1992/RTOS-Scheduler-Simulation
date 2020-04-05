@@ -1,10 +1,23 @@
+/**
+ * @file sched_util.c
+ * @author Ashish Patel (ashishpatel.1992@gmail.com)
+ * @brief Set of ulitity helper functions
+ * @version 1.0
+ * @date 2020-04-05
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 #include<stdio.h>
 #include<math.h>
 #include<float.h>
 #include<limits.h>
-#include"scheduler_datastructure.c"
+#include"sched_dynamicarray.c"
 #include"util/stringencoders/modp_numtoa.c"
-
+/**
+ * @brief debug_print used for printing debuggin information on screen
+ * 
+ */
 #define debug_print(fmt, ...) \
             do { if (DEBUG)\
                     { \
@@ -13,14 +26,29 @@
                                 fprintf(stderr,"\033[0m"); \
                             } \
                 } while (0)
+/**
+ * @brief DEBUG 0 turns off the debugging mode
+ *        DEBUG 1 turns on the debugging mode
+ * 
+ */
 #define DEBUG 0
 
 
 // Calculates GCD of two numbers
 // Ref: https://www.geeksforgeeks.org/program-find-gcd-floating-point-numbers/
+/**
+ * @brief Stores Hyperperiod value globally
+ * 
+ */
 long hyperperiod;
-double gcd_double(double a, double b);
 
+/**
+ * @brief Calculates GCD for Floating point double value upto 3 decimals
+ * 
+ * @param a 
+ * @param b 
+ * @return double 
+ */
 double gcd_double(double a, double b) 
 { 
     if (a < b) 
@@ -33,8 +61,13 @@ double gcd_double(double a, double b)
         else
             return (gcd_double(b, a - floor(a / b) * b)); 
 } 
-//Calculates GCD for multiple numbers
-// int *arr - input numbers
+/**
+ * @brief Calculates GCD for array of Floating point double values
+ * 
+ * @param arr 
+ * @param n 
+ * @return double 
+ */
 double array_gcd_double(double arr[], int n) 
 { 
     double result = arr[0]; 
@@ -49,7 +82,13 @@ double array_gcd_double(double arr[], int n)
     } 
     return result; 
 } 
-
+/**
+ * @brief Calculates LCM for array of Floating point double values
+ * 
+ * @param arr array of periods of all the tasks in taskset
+ * @param n size of taskset
+ * @return double 
+ */
 double array_lcm_double(double arr[], int n) 
 { 
     
@@ -64,10 +103,24 @@ double array_lcm_double(double arr[], int n)
   
     return ans; 
 } 
-
+/**
+ * @brief Returns the value calculated by array_lcm_double
+ * 
+ * @param arr array of periods of all the tasks in taskset
+ * @param size size of taskset
+ * @return double 
+ */
 double calc_hyperperiod(double arr[],int size){
     return array_lcm_double(arr,size);
 }
+
+/**
+ * @brief Returns maximum execution time of task from task_list
+ * 
+ * @param task_list 
+ * @param size size of taskset
+ * @return int 
+ */
 int calc_max_exec_time(struct task *task_list,int size){
     int max_num=INT_MIN;
     for(size_t i=0;i<size;i++){
@@ -77,6 +130,13 @@ int calc_max_exec_time(struct task *task_list,int size){
     }
     return max_num;
 }
+/**
+ * @brief Returns maximum Period of task from task_list
+ * 
+ * @param task_list 
+ * @param size size of taskset
+ * @return int 
+ */
 int calc_max_period(struct task *task_list, int size){
     int max_period = INT_MIN;
     for (size_t i = 0; i < size; i++)
@@ -88,28 +148,15 @@ int calc_max_period(struct task *task_list, int size){
    
     return max_period;
 }
-// frame size should divide hyperperiod
-long check_valid_max_number(struct task *task_list,int n,double frame_length){
-    //TODO Hyperperiod factors
-    short flag = 0; 
-    for (size_t i = 0; i < n; i++)
-    {
-        double period = task_list[i].period;
-        long period_by_frame = floor(period/frame_length) - (period/frame_length);
-        // flag will ensure that there is atleast one framesize that devides Hyperperiod
-        
-        if(  period_by_frame == 0){
-            flag = 1;
-            return (long)frame_length;
-               
-        }
-    }
-    // OTHERWISE SPILT (NOT SURE WHEN TO SLPLIT)
-    printf("\n Unable to find Frame length. Task may not be schedulable");
-    exit(-1); //EXIT if we cannot find a frame length
-        
-    return -1;
-}
+/**
+ * @brief Validates and returns the final frame that satisfies following condition
+ *              for every Ti, 2f – gcd(f, pi) ≤ Di 
+ * 
+ * @param task_list 
+ * @param n size of taskset
+ * @param valid_frame_size_list 
+ * @return long 
+ */
 long calc_final_frame_length(struct task *task_list,int n, DynamicArray *valid_frame_size_list){
     // POSSIBLE FRAME SIZE LIST CALCULATION from HYPERPERIOD
     int largest_frame = valid_frame_size_list->data[0];
@@ -135,7 +182,6 @@ long calc_final_frame_length(struct task *task_list,int n, DynamicArray *valid_f
             }
         }
         if(flag == 0){
-            //TODO: Check if sorting required in case valid_frame_size_list is not in ascending order
                 debug_print("valid frame %d,",f);
                 largest_frame = f;
             }
@@ -143,10 +189,16 @@ long calc_final_frame_length(struct task *task_list,int n, DynamicArray *valid_f
     }
     return largest_frame;
 }
+/**
+ * @brief Generates list of all valid frames for the given taskset
+ * 
+ * @param min_frame_length minimum frame size that you can choose
+ * @param task_list 
+ * @param size size of taskset
+ * @return DynamicArray 
+ */
 DynamicArray generate_valid_frames(int min_frame_length, struct task *task_list,int size){
-    /**
-     * @ModuleTest: REFER Fulltest2.c
-     **/
+    
     DynamicArray valid_frame_size_list;
     DynamicArray_init(&valid_frame_size_list,1);
     int max_period = calc_max_period(task_list,size);
@@ -171,6 +223,19 @@ DynamicArray generate_valid_frames(int min_frame_length, struct task *task_list,
     return valid_frame_size_list;
 
 }
+/**
+ * @brief Returns the best frame size out of all the possible frames generated by following conditions:-
+ *          1) Minimum Context Switching
+ *              f >= max(Ei)
+ *          2) Minimization of Table Size (list o all possible valid frames)
+ *              ⎣M/F⎦ = M/F 
+ *          3) Satisfaction of Task Deadline
+ *              for every Ti, 2f – gcd(f, pi) ≤ Di 
+ * 
+ * @param task_list 
+ * @param size size of taskset
+ * @return long 
+ */
 long calc_frame_size(struct task *task_list,int size){
     int min_frame_length;
     double frame_length;
@@ -191,7 +256,6 @@ long calc_frame_size(struct task *task_list,int size){
     {
         debug_print(" %d \t",valid_frame_size_list.data[i]);
     }
-    debug_print("Hi %c",1);
 
     // Condition 3 calculating largest frame possible frame size using 2f-gcd
     frame_length = calc_final_frame_length(task_list,size,&valid_frame_size_list);
@@ -199,7 +263,16 @@ long calc_frame_size(struct task *task_list,int size){
     return frame_length;
 }
 
-// Converts integer to ASCII
+/**
+ * @brief Converts an integer number into its equivalent string
+ * 
+ * @source https://github.com/Antscran/MSP430/blob/master/SM2432v1.1/ExtFunc/itoa.c
+ * 
+ * @param value input integer number
+ * @param result output equivalent string
+ * @param base base of the number
+ * @return char* 
+ */
 char* int_to_string(int value, char* result, int base) {
     // check that the base if valid
     if (base < 2 || base > 36) { *result = '\0'; return result; }
@@ -224,9 +297,16 @@ char* int_to_string(int value, char* result, int base) {
     return result;
 }
 
-
+/**
+ * @brief Converts a floating point number into its equivalent string
+ * 
+ * @param value input float number
+ * @param str ouput equivalent string
+ * @param prec precision length
+ * @return size_t returns NAN if given value is not a valid floating point number
+ */
 size_t float_to_string(double value, char* str, int prec)
 {
     
-    modp_dtoa(value,str,prec);
+   return modp_dtoa(value,str,prec);
 }

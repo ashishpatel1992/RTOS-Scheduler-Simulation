@@ -1,24 +1,44 @@
 /**
- * TEST MODULE
- * Author: Ashish Patel
- **/
+ * @file sched_queue.c
+ * @author Ashish Patel (ashishpatel.1992@gmail.com)
+ * @brief Queue for QNode type datatype
+ * @version 1.0
+ * @date 2020-04-05
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 #include<stdio.h>
 #include<stdlib.h>
-// A linked list (LL) node to store a queue entry 
+
+/**
+ * @brief A linked list (LL) node to store a task_id and their deadline.
+ *
+ * 
+ */
 struct QNode { 
     long task_id;
     long deadline;
     struct QNode* next; 
 }; 
   
-// The queue, front stores the front node of LL and rear stores the 
-// last node of LL 
+/**
+ * @brief The queue, front stores the front node of LL and rear stores the 
+ *         last node of LL 
+ * 
+ */
 struct Queue { 
     struct QNode *front, *rear; 
     long size;
 }; 
   
-// A utility function to create a new linked list node. 
+/**
+ * @brief Create a new linked list node. 
+ * 
+ * @param task_id 
+ * @param deadline 
+ * @return struct QNode* 
+ */
 struct QNode* newNode(long task_id,long deadline) 
 { 
     struct QNode* temp = (struct QNode*)malloc(sizeof(struct QNode)); 
@@ -28,7 +48,11 @@ struct QNode* newNode(long task_id,long deadline)
     return temp; 
 } 
   
-// A utility function to create an empty queue 
+/**
+ * @brief Create an empty queue 
+ * 
+ * @return struct Queue* 
+ */
 struct Queue* createQueue() 
 { 
     struct Queue* q = (struct Queue*)malloc(sizeof(struct Queue)); 
@@ -37,7 +61,13 @@ struct Queue* createQueue()
     return q; 
 } 
   
-// The function to add a key k to q 
+/**
+ * @brief Insert an element into queue
+ * 
+ * @param q 
+ * @param task_id 
+ * @param deadline 
+ */
 void enQueue(struct Queue* q, long task_id, long deadline) 
 { 
     // Create a new LL node 
@@ -56,28 +86,33 @@ void enQueue(struct Queue* q, long task_id, long deadline)
     q->size++;
 } 
 
-void insertAtQueueFront(struct Queue* q, long task_id, long deadline) 
-{ 
-    // Create a new LL node 
-    struct QNode* temp = newNode(task_id,deadline); 
+// void insertAtQueueFront(struct Queue* q, long task_id, long deadline) 
+// { 
+//     // Create a new LL node 
+//     struct QNode* temp = newNode(task_id,deadline); 
     
-    // If queue is empty, then new node is front and rear both 
-    if (q->rear == NULL) { 
-        q->front = q->rear = temp; 
-        q->size=1;
-        return; 
-    } 
+//     // If queue is empty, then new node is front and rear both 
+//     if (q->rear == NULL) { 
+//         q->front = q->rear = temp; 
+//         q->size=1;
+//         return; 
+//     } 
   
-    // Add the new node at the end of queue and change rear 
-    temp->next = q->front;
-    q->front = temp;
+//     // Add the new node at the end of queue and change rear 
+//     temp->next = q->front;
+//     q->front = temp;
 
-    // q->rear->next = temp; 
-    // q->rear = temp; 
-    q->size++;
-} 
+//     // q->rear->next = temp; 
+//     // q->rear = temp; 
+//     q->size++;
+// } 
 
-// Function to remove a key from given queue q 
+/**
+ * @brief Remove an element from queue
+ * 
+ * @param q 
+ * @return struct QNode 
+ */
 struct QNode deQueue(struct Queue* q) 
 { 
     struct QNode deleted_node;
@@ -101,9 +136,13 @@ struct QNode deQueue(struct Queue* q)
     deleted_node.next = NULL;
     return deleted_node;
 }
-
-/* Function to sort an array using insertion sort*/
-void insertionSort(struct QNode q_arr[], int queue_size) 
+/**
+ * @brief A utility to sort QNode type datatype based on its deadline
+ * 
+ * @param q_arr 
+ * @param queue_size 
+ */
+void qnode_sort(struct QNode q_arr[], int queue_size) 
 { 
     // printf("Insertion Sort");
     struct QNode key;
@@ -129,10 +168,13 @@ void insertionSort(struct QNode q_arr[], int queue_size)
     // fprintf(stderr,"...");
 } 
 
-// void generic_sort(struct QNode q_a)
+/**
+ * @brief A queue sorting function that sorts the queue in ascending order based on task's deadline with the help of qnode_sort
+ * 
+ * @param q input queue that needs to be sorted
+ */
 void queue_sort(struct Queue *q){
-    // printf("Size: >> %ld",q->size);
-    // return ;
+    
     long queue_size = q->size;
     struct QNode q_arr[queue_size];
 
@@ -142,7 +184,7 @@ void queue_sort(struct Queue *q){
         // printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
     }
     
-    insertionSort(q_arr,queue_size);
+    qnode_sort(q_arr,queue_size);
     
     // printf("\n After Sorting: \n");
     
