@@ -3,6 +3,7 @@
 #include<float.h>
 #include<limits.h>
 #include"scheduler_datastructure.c"
+#include"util/stringencoders/modp_numtoa.c"
 
 #define debug_print(fmt, ...) \
             do { if (DEBUG)\
@@ -12,7 +13,7 @@
                                 fprintf(stderr,"\033[0m"); \
                             } \
                 } while (0)
-#define DEBUG 1
+#define DEBUG 0
 
 
 // Calculates GCD of two numbers
@@ -196,4 +197,36 @@ long calc_frame_size(struct task *task_list,int size){
     frame_length = calc_final_frame_length(task_list,size,&valid_frame_size_list);
 
     return frame_length;
+}
+
+// Converts integer to ASCII
+char* int_to_string(int value, char* result, int base) {
+    // check that the base if valid
+    if (base < 2 || base > 36) { *result = '\0'; return result; }
+
+    char* ptr = result, *ptr1 = result, tmp_char;
+    int tmp_value;
+
+    do {
+        tmp_value = value;
+        value /= base;
+        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
+    } while ( value );
+
+    // Apply negative sign
+    if (tmp_value < 0) *ptr++ = '-';
+    *ptr-- = '\0';
+    while(ptr1 < ptr) {
+        tmp_char = *ptr;
+        *ptr--= *ptr1;
+        *ptr1++ = tmp_char;
+    }
+    return result;
+}
+
+
+size_t float_to_string(double value, char* str, int prec)
+{
+    
+    modp_dtoa(value,str,prec);
 }

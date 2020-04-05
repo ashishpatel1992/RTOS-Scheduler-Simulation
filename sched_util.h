@@ -1,5 +1,7 @@
 /* This file was automatically generated.  Do not edit! */
 #undef INTERFACE
+size_t float_to_string(double value,char *str,int prec);
+char *int_to_string(int value,char *result,int base);
 long calc_frame_size(struct task *task_list,int size);
 DynamicArray generate_valid_frames(int min_frame_length,struct task *task_list,int size);
 long calc_final_frame_length(struct task *task_list,int n,DynamicArray *valid_frame_size_list);

@@ -16,6 +16,8 @@
         "algorithm": "c",
         "fort.h": "c",
         "string": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "stdlib.h": "c",
+        "modp_numtoa.h": "c"
     }
 }

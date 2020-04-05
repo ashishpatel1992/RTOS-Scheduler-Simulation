@@ -18,30 +18,7 @@
 extern long hyperperiod;
 void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,int frame_size);
 
-// Converts integer to ASCII
-char* itoa(int value, char* result, int base) {
-    // check that the base if valid
-    if (base < 2 || base > 36) { *result = '\0'; return result; }
 
-    char* ptr = result, *ptr1 = result, tmp_char;
-    int tmp_value;
-
-    do {
-        tmp_value = value;
-        value /= base;
-        *ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * base)];
-    } while ( value );
-
-    // Apply negative sign
-    if (tmp_value < 0) *ptr++ = '-';
-    *ptr-- = '\0';
-    while(ptr1 < ptr) {
-        tmp_char = *ptr;
-        *ptr--= *ptr1;
-        *ptr1++ = tmp_char;
-    }
-    return result;
-}
 
 int main(int argc, char const *argv[])
 {
@@ -80,15 +57,17 @@ int main(int argc, char const *argv[])
         fscanf(fp,"%lf",&task_list[i].execution_time);
     
         fscanf(fp,"%lf",&task_list[i].relative_deadline);
-        printf("Task %d ",task_list[i].id);
-        printf("%.2lf ",task_list[i].phase);
-        printf("%.2lf ",task_list[i].period);
-        printf("%.2lf ",task_list[i].execution_time);
-        printf("%.2lf ",array_period[i]);
-        printf("%.2lf \n",task_list[i].relative_deadline);
+        // printf("Task %d ",task_list[i].id);
+        // printf("%.2lf ",task_list[i].phase);
+        // printf("%.2lf ",task_list[i].period);
+        // printf("%.2lf ",task_list[i].execution_time);
+        // printf("%.2lf ",array_period[i]);
+        // printf("%.2lf \n",task_list[i].relative_deadline);
     
     }
     fclose(fp);
+
+    // Generate Table
     ft_table_t *input_table = ft_create_table();
     ft_set_cell_prop(input_table, 0, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE, FT_ROW_HEADER);
     ft_write_ln(input_table, "TaskID", "Phase", "Period", "Execution Time","Deadline");
@@ -99,14 +78,12 @@ int main(int argc, char const *argv[])
         char task_execution[100];
         char task_relative_deadline[100];
         
-        itoa(i+1,task_id ,10);
-        itoa(task_list[i].phase,task_phase,10);
-        itoa(task_list[i].period,task_period,10);
-        itoa(task_list[i].execution_time,task_execution,10);
-        itoa(task_list[i].relative_deadline,task_relative_deadline,10);
+        int_to_string(i+1,task_id ,10);
+        int_to_string(task_list[i].phase,task_phase,10);
+        int_to_string(task_list[i].period,task_period,10);
+        float_to_string(task_list[i].execution_time,task_execution,2);
+        int_to_string(task_list[i].relative_deadline,task_relative_deadline,10);
 
-
-    // ft_write_ln(input_table, "1", "Ricciardo", "1:25.945", "222.128", "222.128");
         ft_write_ln(input_table, task_id, task_phase, task_period, task_execution, task_relative_deadline);
     }
     printf("%s\n", ft_to_string(input_table));
@@ -140,7 +117,7 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
     for (size_t i = 0; i < no_of_tasks; i++)
     {
         task_division[i] = hyperperiod/task_list[i].period;
-        printf("\nDiv %ld",task_division[i]);
+        // printf("\nDiv %ld",task_division[i]);
     }
     
     
