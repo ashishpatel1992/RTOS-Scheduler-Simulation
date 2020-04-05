@@ -105,7 +105,7 @@ struct QNode deQueue(struct Queue* q)
 /* Function to sort an array using insertion sort*/
 void insertionSort(struct QNode q_arr[], int queue_size) 
 { 
-    printf("Insertion Sort");
+    // printf("Insertion Sort");
     struct QNode key;
     int j;
     
@@ -113,7 +113,6 @@ void insertionSort(struct QNode q_arr[], int queue_size)
         key = q_arr[i]; 
         j = i - 1; 
 
-        // while (j >= 0 && q_arr[j].deadline > key.deadline) {  // (q_arr[j].deadline > key.deadline) is problem
         while (j >= 0 && q_arr[j].deadline > key.deadline) { 
             q_arr[j + 1] = q_arr[j]; 
             j = j - 1; 
@@ -137,32 +136,22 @@ void queue_sort(struct Queue *q){
     long queue_size = q->size;
     struct QNode q_arr[queue_size];
 
-    printf("\nBefore Sorting: \n");
+    // printf("\nBefore Sorting: \n");
     for(int i=0;i<queue_size;i++){
         q_arr[i] = deQueue(q);
-        printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
+        // printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
     }
     
     insertionSort(q_arr,queue_size);
     
-    printf("\n After Sorting: \n");
-    // for(int i=0;i<queue_size;i++){
-    //     printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
-    // }
+    // printf("\n After Sorting: \n");
+    
     printf("\n");
-    // int i;
+    
     for(long i=queue_size-1;i>=0;i--){
         enQueue(q,q_arr[i].task_id,q_arr[i].deadline);
-        printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
+        // printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
     }
-    // printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
-    // for(int i=queue_size-1;i>=0;i--){
-    //     enQueue(q,q_arr[i].task_id,q_arr[i].deadline);
-    //     // q_arr[i] = deQueue(q);
-    //     // printf("(%ld,%ld) ",q_arr[i].task_id, q_arr[i].deadline);
-    // }
-    // printf("\nQz %ld ",queue_size);
-    // printf("\ns:%ld",q->size);
 }
 
 // Test Driver Program to test Module 

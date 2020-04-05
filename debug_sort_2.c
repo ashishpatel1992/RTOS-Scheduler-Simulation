@@ -8,7 +8,6 @@
 *------------------------------------------------------------------------------*/
 #include<stdio.h>
 #include<stdlib.h>
-// #include<string.h>
 #include"task.c"
 #include"sched_util.c"
 
@@ -25,7 +24,7 @@ int main(int argc, char const *argv[])
     
     char ch;
     
-    char file_name[50]="periodicSchedule.txt"; //EXAMPLE WITH VALID 3,4,5 FRAMES  HP 660
+    char file_name[50]="periodicSchedule_ajay.txt"; //EXAMPLE WITH VALID 3,4,5 FRAMES  HP 660
     // char file_name[50]="periodicSchedule2.txt"; //EXAMPLE WITH VALID 3,4,5 FRAMES  HP 660
     // char file_name[50]="periodicSchedule_jobslice.txt"; //EXAMPLE WITH VALID FRAMES ONLY 1
     // char file_name[50]="periodSchedule3_q7.txt"; 
@@ -66,7 +65,7 @@ int main(int argc, char const *argv[])
     
     }
     fclose(fp);
-
+    printf("INPUT DATA");
     // Generate Table
     ft_table_t *input_table = ft_create_table();
     ft_set_cell_prop(input_table, 0, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE, FT_ROW_HEADER);
@@ -88,11 +87,11 @@ int main(int argc, char const *argv[])
     }
     printf("%s\n", ft_to_string(input_table));
     ft_destroy_table(input_table);
-
+    printf("\nSolution:\n");
     hyperperiod = calc_hyperperiod(array_period,no_of_tasks);
     long frame_size = calc_frame_size(task_list,no_of_tasks);
-    printf("HyperPeriod: %ld \n",hyperperiod);
-    printf("\nFrame Size: %ld",frame_size);
+    printf("HyperPeriod: %ld ",hyperperiod);
+    printf("\tFrame Size: %ld",frame_size);
     periodic_scheduler(task_list,no_of_tasks,hyperperiod,frame_size);
     /**
      *  Schedule the periodic Jobs
@@ -124,6 +123,8 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
     // struct Queue* pending_q = createQueue(); 
     struct Queue *remaining_queue = createQueue(); // TASKS REMAINED AFTER FRAME EXECUTION 
     while( clock < hyperperiod){ //instead of clock try with frame_count
+        frame_count++;
+        printf("\n\n================= FRAME %ld (starts at %ld) =================",frame_count,clock);
         double available_frame_time = frame_size;
 
         // Local queue is used for adding new arrival jobs
@@ -132,8 +133,8 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
             struct QNode tmp_node = deQueue(remaining_queue);
             enQueue(local_q,tmp_node.task_id,tmp_node.deadline);    
         }
-        printf("\nRemaining Q size: %ld",remaining_queue->size);
-        printf("\ndefault q size: %ld",local_q->size);
+        // printf("\nRemaining Q size: %ld",remaining_queue->size);
+        // printf("\ndLocal q size: %ld",local_q->size);
         //FOR EACH TASK it will run
         for (size_t task_id = 0; task_id < no_of_tasks; task_id++)
         {
@@ -141,26 +142,23 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
             long arrival_time = task_list[task_id].period * task_division_counter[task_id];
             double execution_time = task_list[task_id].execution_time;
             long abs_deadline_time = task_list[task_id].relative_deadline * (task_division_counter[task_id]+1);
-            // long abs_deadline_time = task_list[task_id].relative_deadline;
-            // debug_print(" AT: %ld, E: %.2lf, abs_deadline: %ld ",arrival_time,execution_time,abs_deadline_time);
             double prev_frame_min_time = (clock - frame_size)+0.01;
             double prev_frame_max_time = (clock);
 
-            printf("\nFor %ld,%ld -- %ld >= %.2lf && %ld <= %.2lf",task_id,task_division_counter[task_id],arrival_time ,prev_frame_min_time, arrival_time, prev_frame_max_time);
+            //printf("\nFor %ld,%ld -- %ld >= %.2lf && %ld <= %.2lf",task_id,task_division_counter[task_id],arrival_time ,prev_frame_min_time, arrival_time, prev_frame_max_time);
             if(arrival_time >=(prev_frame_min_time) && (arrival_time <= prev_frame_max_time)){ //problem if not able scheduled and moved to next frame
-            printf("\n (%ld,%ld,%.2lf,%ld)",task_id,arrival_time,execution_time,abs_deadline_time);
+            //printf("\n (%ld,%ld,%.2lf,%ld)",task_id,arrival_time,execution_time,abs_deadline_time);
             debug_print("min: %.2lf max: %.2lf",prev_frame_min_time,prev_frame_max_time);
                 enQueue(local_q,task_id,abs_deadline_time);
-                // enQueue(local_q,task_id);
-                printf("\t SELECTED %ld",task_id);
+                //printf("\t SELECTED %ld",task_id);
             }
             // struct QNode curr_task = deQueue(local_q);
         }
 
-        printf("\nQueue Size before sorting : %ld",local_q->size); //CHECK WHY SIZE NOT WORKING
+        // printf("\nQueue Size before sorting : %ld",local_q->size); //CHECK WHY SIZE NOT WORKING
         
         queue_sort(local_q);
-        printf("\nQueue Size after sorting: %ld",local_q->size);
+        // printf("\nQueue Size after sorting: %ld",local_q->size);
         int q_size = local_q->size;
 
         
@@ -168,28 +166,29 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
         for(int i=0;i<q_size;i++){
             struct QNode curr_node = deQueue(local_q); //ALWAYS DEQUE SAMETASK which is WRONG
             double curr_task_exec_time = task_list[curr_node.task_id].execution_time;
-            printf("\n IF COND %.2lf <= %.2lf ",curr_task_exec_time, available_frame_time);
+            // printf("\n IF COND %.2lf <= %.2lf ",curr_task_exec_time, available_frame_time);
             if(  curr_task_exec_time<= available_frame_time){ //then schedule it and remove from queue
                 task_division_counter[curr_node.task_id]++;
                 available_frame_time = available_frame_time - curr_task_exec_time;
-                printf("\nItem Executed %ld, Available frame time: %.2lf",curr_node.task_id,available_frame_time);
-                debug_print("\n J%ld,%ld ",curr_node.task_id,task_division_counter[curr_node.task_id]);
+                printf("\nJob Executed J%ld,%ld",curr_node.task_id+1,task_division_counter[curr_node.task_id]);
+                
             }else{ //otherwise putback into queue
                 enQueue(remaining_queue,curr_node.task_id,curr_node.deadline);
 
                 // insertAtQueueFront(local_q,curr_node.task_id,curr_node.deadline);
             }
         }
-        printf("\nAvailable Frame: %.2lf \t Remaining item in Queue %ld",available_frame_time,local_q->size);
-        printf("\nTask_Counter: ");
-        for(int i=0;i<no_of_tasks;i++){
-            printf("%ld\t",task_division_counter[i]);
-        }
-        frame_count++;
-        printf("\n=================FRAME %ld END===============================\n",frame_count);
+        printf("\nSlack: %.2lf",available_frame_time);
+        // printf("\nAvailable Frame: %.2lf \t Remaining item in Queue %ld",available_frame_time,local_q->size);
+        // printf("\nTask_Counter: ");
+        // for(int i=0;i<no_of_tasks;i++){
+        //     printf("%ld\t",task_division_counter[i]);
+        // }
+        
         clock=clock+frame_size;
         
     }
+    printf("\n\n================= Scheduling ENDS at %ld) =================\n",clock);
     int check_schedulable=1;
     for(int i=0;i<no_of_tasks;i++){
         if(task_division_counter[i] != task_division[i]){
@@ -197,10 +196,10 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
         }
     }
     if(check_schedulable != 0){
-        printf("\n Given Taskset is Schedulable");
+        printf("\nGiven Taskset is Schedulable");
     }else{
 
-        printf("\n Given Taskset is NOT Schedulable");
+        printf("\nGiven Taskset is NOT Schedulable");
     }
     
 }
