@@ -188,7 +188,7 @@ void queue_sort(struct Queue *q){
     
     // printf("\n After Sorting: \n");
     
-    printf("\n");
+    // printf("\n");
     
     for(long i=queue_size-1;i>=0;i--){
         enQueue(q,q_arr[i].task_id,q_arr[i].deadline);

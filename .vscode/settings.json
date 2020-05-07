@@ -18,6 +18,8 @@
         "string": "c",
         "string.h": "c",
         "stdlib.h": "c",
-        "modp_numtoa.h": "c"
+        "modp_numtoa.h": "c",
+        "sched_queue.h": "c",
+        "task.h": "c"
     }
 }

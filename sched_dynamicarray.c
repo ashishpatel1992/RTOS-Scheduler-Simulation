@@ -16,7 +16,7 @@
  * @brief Dynamic array datatype that stores integer type data
  * 
  */
-typedef struct{
+typedef struct DA{
     int *data;
     size_t used;
     size_t size;

@@ -12,6 +12,7 @@
 #include<math.h>
 #include<float.h>
 #include<limits.h>
+#include"task.h"
 #include"sched_dynamicarray.c"
 #include"util/stringencoders/modp_numtoa.c"
 /**

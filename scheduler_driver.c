@@ -14,30 +14,31 @@
 #include"task.h"
 #include"sched_util.c"
 #include"periodic_scheduler.c"
-#include "util/libfort/fort.h"
-#include "util/libfort/fort.c"
+#include"util/libfort/fort.c"
 
 extern long hyperperiod;
 
 int main(int argc, char const *argv[])
 {
-    
-    char ch;
-    
-    // char file_name[50]="periodicSchedule_ajay.txt"; //EXAMPLE WITH VALID 3,4,5 FRAMES  HP 660
-    char file_name[50]="periodicSchedule3.txt";
-    // char file_name[50]="periodicSchedule2.txt"; //EXAMPLE WITH VALID 3,4,5 FRAMES  HP 660
-    // char file_name[50]="periodicSchedule_jobslice.txt"; //EXAMPLE WITH VALID FRAMES ONLY 1
-    // char file_name[50]="periodSchedule3_q7.txt"; 
+    char file_name[50];
     int no_of_tasks;
-    FILE *fp;
-    fp = fopen(file_name,"r");
-    if(!fp){
+    FILE *read_fp, *write_fp;
+    if (argc < 2) {
+        printf("missing filename\n");
+        exit(1);
+    }
+    
+    strcpy(file_name, argv[1]);
+    read_fp = fopen(file_name,"r");
+    
+    if(!read_fp){
         printf("\nERROR: Unable to open file '%s'. Please check whether file exist or not.\n",file_name);
         exit(EXIT_FAILURE);
     }
+    
     // Begin File Reading
-    fscanf(fp,"%d",&no_of_tasks);
+    printf("\nReading file %s",file_name);
+    fscanf(read_fp,"%d",&no_of_tasks);
     
     // array containing all tasks
     struct task task_list[no_of_tasks];
@@ -48,27 +49,25 @@ int main(int argc, char const *argv[])
     // read periodic schedule from file
     for(size_t i=0;i<no_of_tasks;i++){
         
-        fscanf(fp,"%d",&task_list[i].id);
-        fscanf(fp,"%lf",&task_list[i].phase);
-        fscanf(fp,"%lf",&array_period[i]);
-        // fscanf(fp,"%lf",&task_list[i].period);
-        task_list[i].period = array_period[i];
+        fscanf(read_fp,"%d",&task_list[i].id);
+        fscanf(read_fp,"%lf",&task_list[i].phase);
+        fscanf(read_fp,"%lf",&array_period[i]);
 
-        // fscanf(fp,"%lf",&task_list[i].execution_time);
-        
-        fscanf(fp,"%lf",&task_list[i].execution_time);
-    
-        fscanf(fp,"%lf",&task_list[i].relative_deadline);
-        // printf("Task %d ",task_list[i].id);
-        // printf("%.2lf ",task_list[i].phase);
-        // printf("%.2lf ",task_list[i].period);
-        // printf("%.2lf ",task_list[i].execution_time);
-        // printf("%.2lf ",array_period[i]);
-        // printf("%.2lf \n",task_list[i].relative_deadline);
+        task_list[i].period = array_period[i];
+        fscanf(read_fp,"%lf",&task_list[i].execution_time);
+        fscanf(read_fp,"%lf",&task_list[i].relative_deadline);
     
     }
-    fclose(fp);
-    printf("\nINPUT DATA\n");
+    fclose(read_fp);
+
+    
+    write_fp = fopen("scheduler_output.txt", "w");
+    if (write_fp == NULL) 
+    { 
+        printf("Could not open file"); 
+        return 0; 
+    } 
+    fprintf(write_fp,"\nINPUT DATA\n");
     // Generate Table for Input Data
     ft_table_t *input_table = ft_create_table();
     ft_set_cell_prop(input_table, 0, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE, FT_ROW_HEADER);
@@ -88,23 +87,24 @@ int main(int argc, char const *argv[])
 
         ft_write_ln(input_table, task_id, task_phase, task_period, task_execution, task_relative_deadline);
     }
-    printf("%s\n", ft_to_string(input_table));
+    fprintf(write_fp,"%s\n", ft_to_string(input_table));
     ft_destroy_table(input_table);
 
 
-    printf("\nSolution:\n");
+    fprintf(write_fp,"\nSolution:\n");
     
     hyperperiod = calc_hyperperiod(array_period,no_of_tasks);
     long frame_size = calc_frame_size(task_list,no_of_tasks);
 
-    printf("HyperPeriod: %ld ",hyperperiod);
-    printf("\tFrame Size: %ld",frame_size);
+    fprintf(write_fp,"HyperPeriod: %ld ",hyperperiod);
+    fprintf(write_fp,"\tFrame Size: %ld",frame_size);
     /**
      * @brief Schedules the Periodc Tasks
      * 
      */
+    fclose(write_fp);
     periodic_scheduler(task_list,no_of_tasks,hyperperiod,frame_size);
-    printf("\n");
+    fprintf(write_fp,"\n");
     
     
     return 0;

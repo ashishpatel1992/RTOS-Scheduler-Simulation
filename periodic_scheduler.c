@@ -10,6 +10,7 @@
  */
 
 #include<stdio.h>
+#include<string.h>
 #include"task.h"
 #include"sched_queue.c"
 /**
@@ -19,8 +20,18 @@
  * @param no_of_tasks 
  * @param hyperperiod 
  * @param frame_size 
+ * 
+ * @return int returns successfully execution
  */
-void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,int frame_size){
+int periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,int frame_size){
+    FILE *write_fp;
+    char *file_name ="scheduler_output.txt";
+    write_fp = fopen(file_name, "a");
+    if (write_fp == NULL) 
+    { 
+        printf("Could not open file"); 
+        return -1; 
+    } 
     long clock=0; // GLOBAL CLOCK
     
     long task_division[no_of_tasks];            // STORES LIST OF JOBS in EACH TASK (MUST RUN TILL HERE)
@@ -39,7 +50,7 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
     struct Queue *remaining_queue = createQueue(); // TASKS REMAINED AFTER FRAME EXECUTION 
     while( clock < hyperperiod){ //instead of clock try with frame_count
         frame_count++;
-        printf("\n\n================= FRAME %ld (starts at %ld) =================",frame_count,clock);
+        fprintf(write_fp,"\n\n================= FRAME %ld (starts at %ld) =================",frame_count,clock);
         double available_frame_time = frame_size;
 
         // Local queue is used for adding new arrival jobs
@@ -66,7 +77,7 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
             // check if job fits in frame, if it fits add it into the Ready Queue
             if(arrival_time >=(prev_frame_min_time) && (arrival_time <= prev_frame_max_time)){ //problem if not able scheduled and moved to next frame
             //printf("\n (%ld,%ld,%.2lf,%ld)",task_id,arrival_time,execution_time,abs_deadline_time);
-            debug_print("min: %.2lf max: %.2lf",prev_frame_min_time,prev_frame_max_time);
+            // debug_print("min: %.2lf max: %.2lf",prev_frame_min_time,prev_frame_max_time);
                 enQueue(local_q,task_id,abs_deadline_time);
                 //printf("\t SELECTED %ld",task_id);
             }
@@ -91,15 +102,13 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
             if( curr_task_exec_time <= available_frame_time){
                 task_division_counter[curr_node.task_id]++;
                 available_frame_time = available_frame_time - curr_task_exec_time;
-                printf("\nJob Executed J%ld,%ld",curr_node.task_id+1,task_division_counter[curr_node.task_id]);
+                fprintf(write_fp,"\nJob Executed J%ld,%ld",curr_node.task_id+1,task_division_counter[curr_node.task_id]);
                 
             }else{ 
                 enQueue(remaining_queue,curr_node.task_id,curr_node.deadline);
-
-                // insertAtQueueFront(local_q,curr_node.task_id,curr_node.deadline);
             }
         }
-        printf("\nSlack: %.2lf",available_frame_time);
+        fprintf(write_fp,"\nSlack: %.2lf",available_frame_time);
         // printf("\nAvailable Frame: %.2lf \t Remaining item in Queue %ld",available_frame_time,local_q->size);
         // printf("\nTask_Counter: ");
         // for(int i=0;i<no_of_tasks;i++){
@@ -109,7 +118,7 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
         clock=clock+frame_size;
         
     }
-    printf("\n\n================= Scheduling till Hyperperiod %ld) =================\n",clock);
+    fprintf(write_fp,"\n\n================= Scheduling till Hyperperiod %ld) =================\n",clock);
     int check_schedulable=1; 
     for(int i=0;i<no_of_tasks;i++){
         // check if all the jobs are scheduled till the end of hyperperiod
@@ -119,10 +128,12 @@ void periodic_scheduler(struct task *task_list,int no_of_tasks,int hyperperiod,i
         }
     }
     if(check_schedulable != 0){
-        printf("\nFor given Taskset all Jobs are Periodic Jobs are Schedulable");
+        fprintf(write_fp,"\nFor given Taskset all Jobs are Periodic Jobs are Schedulable");
     }else{
 
-        printf("\nGiven Taskset is NOT Schedulable");
+        fprintf(write_fp,"\nGiven Taskset is NOT Schedulable");
     }
-    
+    fclose(write_fp);
+    printf("\nSchedule written to file %s\n",file_name);
+    return 0;
 }
