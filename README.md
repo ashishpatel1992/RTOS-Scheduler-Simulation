@@ -1,6 +1,6 @@
 # RTOS Task Scheduler Simulator
 
-This program is a scheduler simulation for Real Time Operating System (RTOS). It takes input as periodic, aperiodic and sporadic tasks and simulate using C Programming language. It uses C99 compiler.
+This program is a scheduler simulation for Real Time Operating System (RTOS). It takes input as periodic, aperiodic and sporadic tasks and simulate using C Programming language.
 
 ## 1. File structure layout
 
