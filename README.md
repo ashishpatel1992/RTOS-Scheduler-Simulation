@@ -47,8 +47,8 @@ This will generate output file `scheduler_output.txt`
 ## 4. Project Status
 Following Tasks has been acoomplished
 - [x] Periodic Scheduler (Done, without tasksplit)
-- [ ] Aperiodic Scheduler (Incomplete)
-- [ ] Sporadic Scheduler (Incomplete)
+- [ ] Aperiodic Scheduler (To Implement)
+- [ ] Sporadic Scheduler (To Implement)
 
 ## 5. Contributers
 Contributers in this project
